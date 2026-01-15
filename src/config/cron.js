@@ -1,0 +1,41 @@
+import cron from "cron";
+
+// The fetch API is built into Node.js (v18+) and handles http/https automatically
+const job = new cron.CronJob("* * * * *", async function () {
+  const url = process.env.API_URL;
+
+  if (!url) {
+    console.error("[Cron] Error: API_URL is not defined.");
+    return;
+  }
+
+  try {
+    const response = await fetch(url);
+    
+    if (response.ok) {
+      console.log(`[Cron] Request successful (Status: ${response.status})`);
+    } else {
+      console.log(`[Cron] Request failed (Status: ${response.status})`);
+    }
+  } catch (error) {
+    // This catches network errors, including protocol mismatches
+    console.error("[Cron] Execution error:", error.message);
+  }
+});
+
+export default job;
+// CRON JOB EXPLANATION:
+// Cron jobs are scheduled tasks that run periodically at fixed intervals
+// we want to send 1 GET request for every 14 minutes
+
+// How to define a "Schedule"?
+// You define a schedule using a cron expression, which consists of 5 fields representing:
+
+//! MINUTE, HOUR, DAY OF THE MONTH, MONTH, DAY OF THE WEEK
+
+//? EXAMPLES && EXPLANATION:
+//* 14 * * * * - Every 14 minutes
+//* 0 0 * * 0 - At midnight on every Sunday
+//* 30 3 15 * * - At 3:30 AM, on the 15th of every month
+//* 0 0 1 1 * - At midnight, on January 1st
+//* 0 * * * * - Every hour
